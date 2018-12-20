@@ -5,12 +5,12 @@
 #include "Level.h"
 #include "EntityManager.h"
 
-class Projectile : public ENG::BaseEntity
+class EnemyProjectile : public ENG::BaseEntity
 {
 public:
-	Projectile(ENG::Application& app, ENG::BaseScene* scene, const glm::vec3& direction);
-	void update(const float delta);
+	EnemyProjectile(ENG::Application& app, ENG::BaseScene* scene, const glm::vec3& direction);
 	void setAlive(const bool alive);
+	void update(const float delta);
 	ENG::Tools::Collision::AABB getRect();
 	void draw3D();
 

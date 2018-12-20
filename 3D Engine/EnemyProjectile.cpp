@@ -1,19 +1,19 @@
-#include "Projectile.h"
+#include "EnemyProjectile.h"
 
-Projectile::Projectile(ENG::Application& app, ENG::BaseScene* scene, const glm::vec3& direction)
+EnemyProjectile::EnemyProjectile(ENG::Application& app, ENG::BaseScene* scene, const glm::vec3& direction)
 	: ENG::BaseEntity(app, scene), direction(direction)
 {
 	sprite.setAnimated(true);
 	sprite.setFrames(glm::vec2(2, 1));
 	sprite.setFrameTime(0.2f);
-	sprite.setTexture(app.getResourceManager().getTexture("Shot.png"));
+	sprite.setTexture(app.getResourceManager().getTexture("EnemyShot.png"));
 	sprite.setBillboard(true, app.getActiveCamera());
 
 	rect.size = glm::vec3(0.3f, 0.3f, 0.3f);
-	light = scene->getLightManager().add(getPosition(), glm::vec3(2.0f, 2.0f, 4.0f) , 1.5f);
+	light = scene->getLightManager().add(getPosition(), glm::vec3(4.0f, 2.0f, 4.0f), 1.5f);
 }
 
-void Projectile::update(const float delta)
+void EnemyProjectile::update(const float delta)
 {
 	sprite.update(delta);
 
@@ -30,19 +30,19 @@ void Projectile::update(const float delta)
 	scene->getLightManager().setPosition(light, getPosition());
 }
 
-ENG::Tools::Collision::AABB Projectile::getRect()
+ENG::Tools::Collision::AABB EnemyProjectile::getRect()
 {
 	return rect;
 }
 
-void Projectile::setAlive(const bool alive)
-{
-	ENG::BaseEntity::setAlive(alive);
-	scene->getLightManager().remove(light);
-}
-
-void Projectile::draw3D()
+void EnemyProjectile::draw3D()
 {
 	sprite.setPosition(getPosition());
 	app.draw3D(sprite);
+}
+
+void EnemyProjectile::setAlive(const bool alive)
+{
+	ENG::BaseEntity::setAlive(alive);
+	scene->getLightManager().remove(light);
 }

@@ -6,6 +6,7 @@
 #include "Tools.h"
 #include "Level.h"
 #include "Projectile.h"
+#include "EnemyProjectile.h"
 #include <glm/gtx/intersect.hpp>
 #include <glm/gtx/compatibility.hpp>
 
@@ -19,6 +20,7 @@ public:
 
 private:
 	float sensitivity = 0.35f;
+	int hp = 5;
 
 	float speed = 5.0f;
 	glm::vec3 direction;
@@ -29,7 +31,10 @@ private:
 	float shoot_time = 0.3f;
 
 	ENG::Sprite2D gun;
+	ENG::Sprite2D heart;
+	ENG::Sprite2D crosshair;
 	ENG::Tools::Collision::AABB rect;
 	std::vector<ENG::Tools::Collision::AABB> solids;
 	std::shared_ptr<Level> level;
+	std::vector<std::shared_ptr<EnemyProjectile>> projectiles;
 };

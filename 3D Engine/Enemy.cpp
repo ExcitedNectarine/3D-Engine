@@ -4,54 +4,118 @@
 Enemy::Enemy(ENG::Application& app, ENG::BaseScene* scene)
 	: ENG::BaseEntity(app, scene)
 {
-	rect.size = glm::vec3(0.1f, 1.0f, 0.1f);
+	rect.size = glm::vec3(0.5f, 0.5f, 0.5f);
 
-	sprite.setAnimated(true);
-	sprite.setFrames(glm::vec2(2, 1));
-	sprite.setFrameTime(0.3f);
-	sprite.setBillboard(true, app.getActiveCamera());
-	sprite.setTexture(app.getResourceManager().getTexture("Enemy.png"));
-	sprite.setPosition(glm::vec3(0.0f, (static_cast<float>(sprite.getTexture()->getSize().y) / 100.0f) - 1, 0.0f));
+	walking.setAnimated(true);
+	walking.setFrames(glm::vec2(2, 1));
+	walking.setFrameTime(0.3f);
+	walking.setBillboard(true, app.getActiveCamera());
+	walking.setTexture(app.getResourceManager().getTexture("Enemy.png"));
+	walking.setPosition(glm::vec3(0.0f, (static_cast<float>(walking.getTexture()->getSize().y) / 100.0f) - 1, 0.0f));
+
+	shoot.setBillboard(true, app.getActiveCamera());
+	shoot.setTexture(app.getResourceManager().getTexture("EnemyShoot.png"));
+	shoot.setPosition(glm::vec3(0.0f, (static_cast<float>(walking.getTexture()->getSize().y) / 100.0f) - 1, 0.0f));
+
+	dead.setBillboard(true, app.getActiveCamera());
+	dead.setTexture(app.getResourceManager().getTexture("EnemyDeath.png"));
+	dead.setPosition(glm::vec3(0.0f, (static_cast<float>(dead.getTexture()->getSize().y) / 100.0f) - 1, 0.0f));
+
+	current = &walking;
 
 	player = scene->getEntityManager().getEntities<Player>()[0];
 }
 
 void Enemy::update(const float delta)
 {
-	sprite.update(delta);
-
 	direction = glm::normalize(player->getPosition() - getPosition());
+
+	switch (state)
+	{
+	case States::WALKING:
+		walkingUpdate(delta);
+		break;
+	case States::SHOOTING:
+		shootingUpdate(delta);
+		break;
+	case States::DEAD:
+		break;
+	}
+
+	current->update(delta);
+}
+
+void Enemy::walkingUpdate(const float delta)
+{
 	velocity = direction * speed;
+
+	projectiles = scene->getEntityManager().getEntities<Projectile>();
+	for (std::shared_ptr<Projectile>& proj : projectiles)
+	{
+		if (ENG::Tools::Collision::AABBTest(rect, proj->getRect()))
+		{
+			proj->setAlive(false);
+
+			state = States::DEAD;
+			current = &dead;
+		}
+	}
 
 	solids = scene->getEntityManager().getEntities<Level>()[0]->getSurroundingSolids(getPosition());
 	solids.push_back(player->getRect());
 
-	rect.position = getPosition() - (rect.size / 2.0f);
+	other_enemies = scene->getEntityManager().getEntities<Enemy>();
+	for (std::shared_ptr<Enemy>& enemy : other_enemies)
+		if (!(rect == enemy->getRect()) && !enemy->isDead())
+			solids.push_back(enemy->getRect());
+
+	// MOVEMENT AND COLLISION
+	rect.position = getPosition();
 	rect.position.x += velocity.x * delta;
 	for (ENG::Tools::Collision::AABB& solid : solids)
 	{
-		solid.position -= solid.size / 2.0f;
 		if (ENG::Tools::Collision::AABBTest(rect, solid))
 		{
 			if (velocity.x > 0.0f)
-				rect.position.x = solid.position.x - rect.size.x;
+				rect.position.x = (solid.position.x - (solid.size.x / 2.0f)) - (rect.size.x / 2.0f);
 			else if (velocity.x < 0.0f)
-				rect.position.x = solid.position.x + solid.size.x;
+				rect.position.x = (solid.position.x + (solid.size.x / 2.0f)) + (rect.size.x / 2.0f);
 		}
 	}
 	rect.position.z += velocity.z * delta;
 	for (ENG::Tools::Collision::AABB& solid : solids)
 	{
-		solid.position -= solid.size / 2.0f;
 		if (ENG::Tools::Collision::AABBTest(rect, solid))
 		{
 			if (velocity.z > 0.0f)
-				rect.position.z = solid.position.z - rect.size.z;
+				rect.position.z = (solid.position.z - (solid.size.z / 2.0f)) - (rect.size.z / 2.0f);
 			else if (velocity.z < 0.0f)
-				rect.position.z = solid.position.z + solid.size.z;
+				rect.position.z = (solid.position.z + (solid.size.z / 2.0f)) + (rect.size.z / 2.0f);
 		}
 	}
-	setPosition(rect.position + (rect.size / 2.0f));
+	setPosition(rect.position);
+
+	if (!ENG::Tools::randomInt(0, 200))
+	{
+		state = States::SHOOTING;
+		current = &shoot;
+	}
+}
+
+void Enemy::shootingUpdate(const float delta)
+{
+	shoot_timer += delta;
+	if (shoot_timer >= shoot_time)
+	{
+		// create projectile
+		scene->getEntityManager().addEntity<EnemyProjectile>(
+			direction
+		)->setPosition(getPosition());
+
+		state = States::WALKING;
+		shoot_timer = 0.0f;
+		current = &walking;
+	}
 }
 
 ENG::Tools::Collision::AABB Enemy::getRect()
@@ -62,6 +126,6 @@ ENG::Tools::Collision::AABB Enemy::getRect()
 
 void Enemy::draw3D()
 {
-	sprite.setPosition(glm::vec3(getPosition().x, sprite.getPosition().y, getPosition().z));
-	app.draw3D(sprite);
+	current->setPosition(glm::vec3(getPosition().x, current->getPosition().y, getPosition().z));
+	app.draw3D(*current);
 }

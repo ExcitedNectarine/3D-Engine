@@ -129,6 +129,7 @@
     <ClCompile Include="Clock.cpp" />
     <ClCompile Include="ConfigurationManager.cpp" />
     <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="EnemyProjectile.cpp" />
     <ClCompile Include="EntityManager.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Level.cpp" />
@@ -155,6 +156,7 @@
     <ClInclude Include="ConfigurationManager.h" />
     <ClInclude Include="Drawable.h" />
     <ClInclude Include="Enemy.h" />
+    <ClInclude Include="EnemyProjectile.h" />
     <ClInclude Include="EntityManager.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Level.h" />
