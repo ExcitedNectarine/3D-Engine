@@ -29,6 +29,8 @@ private:
 	};
 	States state = States::WALKING;
 
+	int hp = 3;
+
 	glm::vec3 direction;
 	glm::vec3 velocity;
 	float speed = 1.0f;

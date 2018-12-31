@@ -12,6 +12,7 @@ namespace ENG
 		int getFPSLimit() const;
 		void setFPSLimit(const int fps_limit);
 		float update();
+		int getCurrentFPS();
 
 	private:
 		int fps_limit = 0;

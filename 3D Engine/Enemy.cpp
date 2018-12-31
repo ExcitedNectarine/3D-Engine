@@ -56,8 +56,12 @@ void Enemy::walkingUpdate(const float delta)
 		{
 			proj->setAlive(false);
 
-			state = States::DEAD;
-			current = &dead;
+			if (--hp == 0)
+			{
+				state = States::DEAD;
+				current = &dead;
+				player->addHealth();
+			}
 		}
 	}
 

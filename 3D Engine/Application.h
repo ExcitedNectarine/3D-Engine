@@ -21,8 +21,8 @@ namespace ENG
 		void run();
 		void quit();
 
-		void draw2D(Drawable& drawable);
-		void draw3D(Drawable& drawable);
+		void draw2D(Drawable& drawable, const bool shaded = true);
+		void draw3D(Drawable& drawable, const bool shaded = true);
 
 		Window& getWindow();
 		Input& getInput();
@@ -35,17 +35,21 @@ namespace ENG
 		void setActiveCamera(Transformable3D* camera);
 
 		glm::vec3 player_pos;
+	
 	private:
 		Window window;
 		Clock clock;
 		Input input;
 		ShaderProgram shader_3d;
 		ShaderProgram shader_2d;
+		ShaderProgram unshaded;
 
 		SceneManager scenes;
 		ResourceManager resources;
 		ConfigurationManager configuration;
-		Transformable3D* active_camera;
+
+		Transformable3D default_camera;
+		Transformable3D* active_camera = &default_camera;
 
 		glm::mat4 perspective;
 		glm::mat4 orthographic;

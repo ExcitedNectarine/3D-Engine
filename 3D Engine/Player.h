@@ -17,6 +17,7 @@ public:
 	void update(const float delta);
 	ENG::Tools::Collision::AABB getRect();
 	void draw2D();
+	void addHealth() { if (hp >= 0) hp++; }
 
 private:
 	float sensitivity = 0.35f;

@@ -15,18 +15,19 @@ namespace ENG
 
 		// Create both projection matrices.
 		perspective = glm::perspective(glm::radians(static_cast<float>(fov)), static_cast<float>(width) / height, 0.1f, 500.0f);
-		orthographic = glm::ortho(0.0f, static_cast<float>(width), 0.0f, static_cast<float>(height), 0.0f, 1.0f);
+		orthographic = glm::ortho(0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f);
+		//orthographic = glm::scale(orthographic, glm::vec3(1.0f, -1.0f, 1.0f));
 
 		window.create(glm::ivec2(width, height), "FPS"); // create the window
 		clock.setFPSLimit(framerate); // set the framerate limit
 
 		shader_3d.create("Resources/Shaders/3d.vert", "Resources/Shaders/3d.frag");
 		shader_2d.create("Resources/Shaders/2d.vert", "Resources/Shaders/2d.frag");
+		unshaded.create("Resources/Shaders/unshaded.vert", "Resources/Shaders/unshaded.frag");
 		shader_3d.setUniform("projection", perspective);
 		shader_2d.setUniform("projection", orthographic);
 
 		resources.loadAll("Resources/Textures");
-		input.setCaptureMouse(true);
 	}
 
 	void Application::run()
@@ -70,17 +71,22 @@ namespace ENG
 
 			shader_2d.setUniform("player", player_pos);
 			
-			window.clear(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+			window.clear(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
 			// Set the projection and the view for 3D drawing.
+			unshaded.setUniform("projection", perspective);
+			unshaded.setUniform("view", glm::inverse(active_camera->getTransform()));
 			shader_3d.setUniform("view", glm::inverse(active_camera->getTransform()));
 			scenes.getCurrentScene().draw3D();
 			
 			// Set the projection and the view for 2D drawing.
+			unshaded.setUniform("projection", orthographic);
+			unshaded.setUniform("view", glm::mat4(1.0f));
 			shader_2d.setUniform("view", glm::mat4(1.0f));
 			scenes.getCurrentScene().draw2D();
 			
 			window.display();
+			window.setTitle("FPS - " + std::to_string(clock.getCurrentFPS()));
 		}
 	}
 
@@ -89,14 +95,20 @@ namespace ENG
 		running = false;
 	}
 
-	void Application::draw3D(Drawable& drawable)
+	void Application::draw3D(Drawable& drawable, const bool shaded)
 	{
-		drawable.draw(shader_3d);
+		if (shaded)
+			drawable.draw(shader_3d);
+		else
+			drawable.draw(unshaded);
 	}
 
-	void Application::draw2D(Drawable& drawable)
+	void Application::draw2D(Drawable& drawable, const bool shaded)
 	{
-		drawable.draw(shader_2d);
+		if (shaded)
+			drawable.draw(shader_2d);
+		else
+			drawable.draw(unshaded);
 	}
 
 	Window& Application::getWindow()

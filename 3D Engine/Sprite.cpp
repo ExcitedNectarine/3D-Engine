@@ -198,23 +198,26 @@ namespace ENG
 		else
 		{
 			std::shared_ptr<VertexBuffer> tex_coords(new VertexBuffer);
-			tex_coords->add(glm::vec2(0.0f, 1.0f));
-			tex_coords->add(glm::vec2(1.0f, 0.0f));
+
 			tex_coords->add(glm::vec2(0.0f, 0.0f));
-			tex_coords->add(glm::vec2(0.0f, 1.0f));
 			tex_coords->add(glm::vec2(1.0f, 1.0f));
+			tex_coords->add(glm::vec2(0.0f, 1.0f));
+			tex_coords->add(glm::vec2(0.0f, 0.0f));
 			tex_coords->add(glm::vec2(1.0f, 0.0f));
+			tex_coords->add(glm::vec2(1.0f, 1.0f));
 
 			quad->setBuffer("tex_coords", tex_coords);
 		}
 
 		std::shared_ptr<VertexBuffer> positions(new VertexBuffer);
+		
 		positions->add(glm::vec2(0.0f, size.y));
 		positions->add(glm::vec2(size.x, 0.0f));
 		positions->add(glm::vec2(0.0f, 0.0f));
 		positions->add(glm::vec2(0.0f, size.y));
 		positions->add(glm::vec2(size.x, size.y));
 		positions->add(glm::vec2(size.x, 0.0f));
+
 		quad->setBuffer("position", positions);
 	}
 
@@ -267,12 +270,12 @@ namespace ENG
 		glm::vec2 huv(frame_size.x * frame.x, frame_size.y * frame.y);
 		glm::vec2 luv = huv - frame_size;
 
-		tex_coords->add(glm::vec2(luv.x, huv.y));
-		tex_coords->add(glm::vec2(huv.x, luv.y));
 		tex_coords->add(glm::vec2(luv.x, luv.y));
-		tex_coords->add(glm::vec2(luv.x, huv.y));
 		tex_coords->add(glm::vec2(huv.x, huv.y));
+		tex_coords->add(glm::vec2(luv.x, huv.y));
+		tex_coords->add(glm::vec2(luv.x, luv.y));
 		tex_coords->add(glm::vec2(huv.x, luv.y));
+		tex_coords->add(glm::vec2(huv.x, huv.y));
 
 		quad->setBuffer("tex_coords", tex_coords);
 	}

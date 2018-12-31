@@ -24,7 +24,7 @@ namespace ENG
 				mouse_offset = glm::vec2(event.motion.yrel, event.motion.xrel);
 		}
 
-		SDL_GetMouseState((int*)&mouse_position.x, (int*)&mouse_position.y);
+		SDL_GetMouseState(&mouse_position.x, &mouse_position.y);
 		keys = SDL_GetKeyboardState(nullptr);
 
 		return false;
@@ -40,7 +40,7 @@ namespace ENG
 		return SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(button);
 	}
 
-	glm::vec2 Input::getMousePosition() const
+	glm::ivec2 Input::getMousePosition() const
 	{
 		return mouse_position;
 	}

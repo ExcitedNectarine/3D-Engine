@@ -12,7 +12,7 @@ Player::Player(ENG::Application& app, ENG::BaseScene* scene)
 	gun.setFrames(glm::vec2(2, 1));
 	gun.setFrameTime(shoot_time / 2.0f);
 	gun.setTexture(app.getResourceManager().getTexture("Gun.png"));
-	gun.setPosition(glm::vec2(app.getWindow().getSize().x / 2, 0.0f));
+	gun.setPosition(glm::vec2(app.getWindow().getSize().x / 2, app.getWindow().getSize().y - gun.getTexture()->getSize().y));
 	gun.moveBy(glm::vec2(75.0f, 0.0f));
 
 	heart.setTexture(app.getResourceManager().getTexture("Heart.png"));
@@ -114,7 +114,10 @@ void Player::update(const float delta)
 		{
 			proj->setAlive(false);
 			if (--hp == 0)
-				app.quit();
+			{
+				app.getInput().setCaptureMouse(false);
+				scene->setAlive(false);
+			}
 		}
 	}
 }
@@ -127,11 +130,11 @@ ENG::Tools::Collision::AABB Player::getRect()
 void Player::draw2D()
 {
 	app.draw2D(gun);
-	app.draw2D(crosshair);
+	app.draw2D(crosshair, false);
 
 	for (int i = 0; i < hp; i++)
 	{
 		heart.setPosition(glm::vec2((i * heart.getTexture()->getSize().x) + 20.0f, 20.0f));
-		app.draw2D(heart);
+		app.draw2D(heart, false);
 	}
 }

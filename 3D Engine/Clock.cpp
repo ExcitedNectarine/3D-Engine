@@ -36,4 +36,9 @@ namespace ENG
 
 		return delta;
 	}
+
+	int Clock::getCurrentFPS()
+	{
+		return 1000 / frame;
+	}
 }
